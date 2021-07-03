@@ -103,8 +103,12 @@ FileOperations.prototype.write = function (filepath, content, append) {
 };
 
 FileOperations.prototype.exists = function (filepath) {
-  var file = new File(filepath);
-  return file.exists;
+  try {
+    var file = new File(filepath);
+    return file.exists;
+  } catch (err) {
+    this.alert.log(err);
+  }
 };
 
 //Return the local scripts path of user

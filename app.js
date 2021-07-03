@@ -43,10 +43,23 @@ function setup() {
     baseLayout.setContentsMargins(250, 0, 0, 0);
 
     //ui elements
+    var onTBServer = false;
     var kitsuLocationInput = pageFrame.groupBox.lineEdit;
     var submitBtn = pageFrame.groupBox.pushButton;
     var serverHostname = pageFrame.groupBox.lineEdit_2;
+    var toggleBtn = pageFrame.groupBox.radioButton_2;
     serverHostname.hide();
+
+    //toggle TB server hostname input
+    toggleBtn.toggled.connect(function (checked) {
+      if (checked) {
+        serverHostname.hide();
+        onTBServer = false;
+      } else {
+        serverHostname.show();
+        onTBServer = true;
+      }
+    });
 
     var packageConfigFile = fileOperations.read(jsonFilePath)
       ? fileOperations.read(jsonFilePath)
@@ -67,10 +80,17 @@ function setup() {
           current_project: {},
         };
 
-        var packageConfig = JSON.stringify(config, null, " ");
-        if (fileOperations.write(jsonFilePath, packageConfig)) {
-          pageToggle(pageIndex, pageIndex + 1);
-          login();
+        if (onTBServer) {
+          var tbServerHostname = pageFrame.groupBox.lineEdit_2;
+          config.tbServerHostname = tbServerHostname.text;
+          //check in location exists
+          if (fileOperations.exists(tbServerHostname.toString())) {
+            saveConfig(config);
+          } else {
+            alert.warning("Invalid TB server hostname!");
+          }
+        } else {
+          saveConfig(config);
         }
       }
     });
@@ -414,6 +434,18 @@ function toggleComponents(layout, newPage) {
     layout.itemAt(count).widget().hide();
   }
   newPage.show();
+}
+
+function saveConfig(config) {
+  try {
+    var packageConfig = JSON.stringify(config, null, " ");
+    if (fileOperations.write(jsonFilePath, packageConfig)) {
+      pageToggle(0, 1);
+      login();
+    }
+  } catch (err) {
+    alert.log(err);
+  }
 }
 
 // exports.load = load

@@ -73,23 +73,27 @@ function getPreviewFile(preview) {
  * @param {Array} objects
  * @returns {Array}
  */
-function sortObjects(objects) {
+function sortObjects(objects, dateType) {
   var slicedObjects = objects.slice(0);
   slicedObjects.sort(function (a, b) {
-    return b.updated_at - a.updated_at;
+    var result =
+      dateType == "updated"
+        ? b.updated_at - a.updated_at
+        : b.created_at - a.created_at;
+    return result;
   });
   return slicedObjects;
 }
 
 /**
- * Change the date value of "updated_at" on every
+ * Change the date value of "created_at" on every
  * object to milliseconds value.
  * @param {Array} objects
  * @returns {Array}
  */
 function refactorDates(objects) {
   var newObjects = objects.map(function (object) {
-    object.updated_at = getMilliSec(object.updated_at);
+    object.created_at = getMilliSec(object.created_at);
     return object;
   });
   return newObjects;
@@ -101,10 +105,11 @@ function getMilliSec(jsonDate) {
   var time = jsonDate.split("T")[1];
   var dateSplit = date.split("-");
   var timeSplit = time.split(":");
+
   //ES5 keeps throwing "invalid date" error if the date str is added directly
   var newDate = new Date(
     dateSplit[0],
-    (parseInt(dateSplit[1]) - 1).toString(),
+    dateSplit[1] - 1,
     dateSplit[2],
     timeSplit[0],
     timeSplit[1],

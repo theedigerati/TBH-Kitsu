@@ -82,9 +82,9 @@ function setup() {
 
         if (onTBServer) {
           var tbServerHostname = pageFrame.groupBox.lineEdit_2;
-          config.tbServerHostname = tbServerHostname.text;
           //check in location exists
-          if (fileOperations.exists(tbServerHostname.toString())) {
+          if (fileOperations.exists(tbServerHostname.text.toString())) {
+            config.tbServerHostname = tbServerHostname.text.toString();
             saveConfig(config);
           } else {
             alert.warning("Invalid TB server hostname!");
